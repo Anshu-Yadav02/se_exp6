@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Sign in to continue to your account</p>
+
+        <form id="loginForm">
+
+            <div class="input-group">
+                <input type="email" id="email" placeholder=" " required>
+                <label for="email">Email Address</label>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" placeholder=" " required>
+                <label for="password">Password</label>
+            </div>
+
+            <label class="showpass">
+                <input type="checkbox" onclick="togglePassword()"> Show Password
+            </label>
+
+            <div id="loginMessage"></div>
+
+            <button type="submit">Sign In</button>
+
+        </form>
+
+        <p>Don't have an account? <a href="register.html">Create one</a></p>
+
+    </div>
+
+    <script>
+
+        function togglePassword() {
+            let pass = document.getElementById("password")
+
+            if (pass.type === "password") {
+                pass.type = "text"
+            } else {
+                pass.type = "password"
+            }
+        }
+
+        // ── Email validation regex ──
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+        // Real-time email validation feedback
+        document.getElementById("email").addEventListener("keyup", function () {
+            const val = this.value.trim()
+
+            if (val.length === 0) {
+                this.style.borderColor = ""
+                return
+            }
+
+            if (emailRegex.test(val)) {
+                this.style.borderColor = "rgba(52, 211, 153, 0.5)"
+                this.style.boxShadow = "0 0 0 3px rgba(52, 211, 153, 0.1)"
+            } else {
+                this.style.borderColor = "rgba(251, 113, 133, 0.6)"
+                this.style.boxShadow = "0 0 0 3px rgba(251, 113, 133, 0.1)"
+            }
+        })
+
+        document.getElementById("email").addEventListener("blur", function () {
+            this.style.boxShadow = ""
+        })
+
+        document.getElementById("loginForm").addEventListener("submit", async function (e) {
+
+            e.preventDefault()
+
+            const emailField = document.getElementById("email")
+            const passwordField = document.getElementById("password")
+            const msgDiv = document.getElementById("loginMessage")
+
+            const emailVal = emailField.value.trim()
+
+            // Email validation
+            if (!emailRegex.test(emailVal)) {
+                msgDiv.textContent = "Invalid Email Address"
+                msgDiv.style.color = "#fb7185"
+                emailField.style.borderColor = "rgba(251, 113, 133, 0.6)"
+                return
+            }
+
+            const data = {
+                email: emailVal,
+                password: passwordField.value
+            }
+
+            try {
+
+                const res = await fetch("http://localhost:5000/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                })
+
+                const result = await res.json()
+
+                msgDiv.textContent = result.message
+
+                if (result.success) {
+                    msgDiv.style.color = "#34d399"
+                    setTimeout(() => {
+                        window.location.href = "success.html"
+                    }, 600)
+                } else {
+                    msgDiv.style.color = "#fb7185"
+                }
+
+            } catch (err) {
+                msgDiv.textContent = "Unable to connect to server"
+                msgDiv.style.color = "#fb7185"
+            }
+
+        })
+
+    </script>
+
+    <script src="tubes-bg.js" type="module"></script>
+
+</body>
+
+</html>

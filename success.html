@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Successful</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container" style="text-align:center;">
+
+        <div class="success-icon">🎉</div>
+
+        <div class="success-title">Login Successful</div>
+
+        <p class="success-subtitle">
+            Welcome back! You have been authenticated successfully.<br>
+            You now have full access to your account.
+        </p>
+
+        <div class="divider"></div>
+
+        <div class="btn-group">
+
+            <a href="#" class="btn-dashboard">Go to Dashboard</a>
+
+            <a href="login.html" class="btn-logout" onclick="handleLogout()">Logout</a>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="info-row">
+            <span>Status: Authenticated ✅</span>
+            <span id="loginTime"></span>
+        </div>
+
+    </div>
+
+    <script>
+
+        // ── Timestamp ──
+        const now = new Date()
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        const dateStr = now.toLocaleDateString()
+        document.getElementById("loginTime").textContent = dateStr + " " + timeStr
+
+        function handleLogout() {
+            alert("You have been logged out.")
+        }
+
+    </script>
+
+    <script src="tubes-bg.js" type="module"></script>
+
+</body>
+
+</html>

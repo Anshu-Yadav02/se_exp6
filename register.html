@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        #captchaCanvas {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Create Account</h2>
+        <p class="subtitle">Join us today — it only takes a minute</p>
+
+        <form id="registerForm">
+
+            <div class="input-row">
+                <div class="input-group">
+                    <input type="text" id="firstname" placeholder=" " required>
+                    <label for="firstname">First Name</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="lastname" placeholder=" " required>
+                    <label for="lastname">Last Name</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <input type="email" id="email" placeholder=" " required>
+                <label for="email">Email Address</label>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <input type="text" id="phone" placeholder=" " maxlength="10">
+                    <label for="phone">Phone Number</label>
+                </div>
+                <div class="input-group">
+                    <select id="gender" onchange="this.classList.toggle('has-value', this.value !== '')">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <label for="gender">Gender</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <input type="date" id="dob" placeholder=" ">
+                <label for="dob">Date of Birth</label>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <input type="password" id="password" placeholder=" " required>
+                    <label for="password">Password</label>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="confirmPassword" placeholder=" " required>
+                    <label for="confirmPassword">Confirm Password</label>
+                </div>
+            </div>
+
+            <label class="showpass">
+                <input type="checkbox" onclick="togglePassword()">
+                <span>Show Password</span>
+            </label>
+
+            <div class="captchaBox">
+                <canvas id="captchaCanvas" width="160" height="50"></canvas>
+                <button type="button" onclick="generateCaptcha()" class="refresh">↻</button>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="captchaInput" placeholder=" ">
+                <label for="captchaInput">Enter CAPTCHA</label>
+            </div>
+
+            <div id="captchaStatus"></div>
+
+            <div id="registerMessage"></div>
+
+            <button type="submit">Create Account</button>
+
+        </form>
+
+        <p>Already have an account? <a href="login.html">Sign in</a></p>
+
+    </div>
+
+    <script>
+
+        let captchaText = ""
+        let captchaAttempts = 0
+
+        function generateCaptcha() {
+
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+            captchaText = ""
+
+            for (let i = 0; i < 5; i++) {
+                captchaText += chars[Math.floor(Math.random() * chars.length)]
+            }
+
+            drawCaptcha()
+            document.getElementById("captchaStatus").innerHTML = ""
+            document.getElementById("captchaInput").value = ""
+            document.getElementById("captchaInput").disabled = false
+        }
+
+        function drawCaptcha() {
+
+            const canvas = document.getElementById("captchaCanvas")
+            const ctx = canvas.getContext("2d")
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+            // Noise dots
+            for (let i = 0; i < 40; i++) {
+                ctx.fillStyle = `rgba(129, 140, 248, ${Math.random() * 0.3})`
+                ctx.beginPath()
+                ctx.arc(Math.random() * 160, Math.random() * 50, Math.random() * 2, 0, Math.PI * 2)
+                ctx.fill()
+            }
+
+            ctx.font = "bold 28px 'Inter', Arial"
+
+            for (let i = 0; i < captchaText.length; i++) {
+                let x = 18 + i * 28
+                let y = 35
+                let angle = (Math.random() - 0.5) * 0.5
+
+                // Random colors from the palette
+                const colors = ['#818cf8', '#a78bfa', '#667eea', '#c4b5fd', '#6366f1']
+                ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)]
+
+                ctx.save()
+                ctx.translate(x, y)
+                ctx.rotate(angle)
+                ctx.fillText(captchaText[i], 0, 0)
+                ctx.restore()
+            }
+
+            // Noise lines
+            for (let i = 0; i < 3; i++) {
+                ctx.strokeStyle = `rgba(129, 140, 248, ${0.15 + Math.random() * 0.15})`
+                ctx.lineWidth = 1
+                ctx.beginPath()
+                ctx.moveTo(Math.random() * 160, Math.random() * 50)
+                ctx.lineTo(Math.random() * 160, Math.random() * 50)
+                ctx.stroke()
+            }
+        }
+
+        generateCaptcha()
+
+        function togglePassword() {
+            let p1 = document.getElementById("password")
+            let p2 = document.getElementById("confirmPassword")
+
+            if (p1.type === "password") {
+                p1.type = "text"
+                p2.type = "text"
+            } else {
+                p1.type = "password"
+                p2.type = "password"
+            }
+        }
+
+        document.getElementById("captchaInput").addEventListener("keyup", function () {
+            let user = this.value.trim().toUpperCase()
+
+            if (user === captchaText) {
+                document.getElementById("captchaStatus").innerHTML = "✅ CAPTCHA Correct"
+                document.getElementById("captchaStatus").style.color = "#34d399"
+            } else if (user.length > 0) {
+                document.getElementById("captchaStatus").innerHTML = "❌ CAPTCHA Not Matching"
+                document.getElementById("captchaStatus").style.color = "#fb7185"
+            } else {
+                document.getElementById("captchaStatus").innerHTML = ""
+            }
+        })
+
+        // ── Email validation regex ──
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+        // Real-time email validation feedback
+        document.getElementById("email").addEventListener("keyup", function () {
+            const emailInput = this
+            const val = emailInput.value.trim()
+
+            if (val.length === 0) {
+                emailInput.style.borderColor = ""
+                return
+            }
+
+            if (emailRegex.test(val)) {
+                emailInput.style.borderColor = "rgba(52, 211, 153, 0.5)"
+                emailInput.style.boxShadow = "0 0 0 3px rgba(52, 211, 153, 0.1)"
+            } else {
+                emailInput.style.borderColor = "rgba(251, 113, 133, 0.6)"
+                emailInput.style.boxShadow = "0 0 0 3px rgba(251, 113, 133, 0.1)"
+            }
+        })
+
+        document.getElementById("email").addEventListener("blur", function () {
+            this.style.boxShadow = ""
+        })
+
+        document.getElementById("registerForm").addEventListener("submit", async function (e) {
+
+            e.preventDefault()
+
+            const msgDiv = document.getElementById("registerMessage")
+
+            // Email validation
+            const emailVal = document.getElementById("email").value.trim()
+            if (!emailRegex.test(emailVal)) {
+                msgDiv.textContent = "Invalid Email Address"
+                msgDiv.style.color = "#fb7185"
+                document.getElementById("email").style.borderColor = "rgba(251, 113, 133, 0.6)"
+                return
+            }
+
+            let password = document.getElementById("password").value
+            let confirm = document.getElementById("confirmPassword").value
+
+            if (password !== confirm) {
+                msgDiv.textContent = "Passwords do not match"
+                msgDiv.style.color = "#fb7185"
+                return
+            }
+
+            let userCaptcha = document.getElementById("captchaInput").value.trim().toUpperCase()
+
+            if (userCaptcha !== captchaText) {
+
+                captchaAttempts++
+
+                msgDiv.textContent = "Invalid CAPTCHA — Attempt " + captchaAttempts + " / 3"
+                msgDiv.style.color = "#fb7185"
+
+                generateCaptcha()
+
+                if (captchaAttempts >= 3) {
+                    msgDiv.textContent = "Too many wrong CAPTCHA attempts. Please refresh the page."
+                    document.getElementById("captchaInput").disabled = true
+                }
+
+                return
+            }
+
+            const data = {
+                firstname: document.getElementById("firstname").value.trim(),
+                lastname: document.getElementById("lastname").value.trim(),
+                email: document.getElementById("email").value.trim(),
+                phone: document.getElementById("phone").value.trim(),
+                gender: document.getElementById("gender").value,
+                dob: document.getElementById("dob").value,
+                password: password
+            }
+
+            try {
+
+                const res = await fetch("http://localhost:5000/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                })
+
+                const result = await res.json()
+
+                msgDiv.textContent = result.message
+
+                if (result.success) {
+                    msgDiv.style.color = "#34d399"
+                    setTimeout(() => {
+                        window.location.href = "login.html"
+                    }, 1000)
+                } else {
+                    msgDiv.style.color = "#fb7185"
+                }
+
+            } catch (err) {
+                msgDiv.textContent = "Unable to connect to server"
+                msgDiv.style.color = "#fb7185"
+            }
+
+        })
+
+    </script>
+
+    <script src="tubes-bg.js" type="module"></script>
+
+</body>
+
+</html>
